@@ -1,16 +1,15 @@
 # tasker
 
-A new Flutter project.
+A simple todo app with flutter
 
-## Getting Started
+## Features
 
-This project is a starting point for a Flutter application.
+1. Light/dark mode (User can switch between dark and light modes)
+2. Ability to add a todo based on priority
+3. Ability to perform all crud operations on a todo item
 
-A few resources to get you started if this is your first Flutter project:
+### Implementation
+- SQflite (Plugin for storing all the todo tasks)
+- Local notifications
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
