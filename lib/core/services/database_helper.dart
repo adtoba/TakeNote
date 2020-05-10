@@ -56,7 +56,7 @@ class DatabaseHelper {
   Future<int> deleteTask(int id) async {
     final Database dbClient = await database;
     final Future<int> result = dbClient.rawDelete('DELETE FROM ${Constants.TASK_TABLE} WHERE ${Constants.colId} = $id');
-
+    print(result.toString());
     return result;
   }
 
