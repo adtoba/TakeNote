@@ -1,6 +1,6 @@
-# tasker
+# Tasker
 
-A simple todo app with flutter
+A simple sqflite todo app with flutter
 
 ## Features
 
@@ -8,8 +8,5 @@ A simple todo app with flutter
 2. Ability to add a todo based on priority
 3. Ability to perform all crud operations on a todo item
 
-### Implementation
-- SQflite (Plugin for storing all the todo tasks)
-- Local notifications
 
 
