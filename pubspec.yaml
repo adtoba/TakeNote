@@ -29,6 +29,7 @@ dependencies:
   sqflite: any
   path_provider: any
   table_calendar: ^2.2.3
+  dynamic_theme: any
   intl: ^0.16.1  
   shared_preferences: any
   flutter_local_notifications: ^1.4.3

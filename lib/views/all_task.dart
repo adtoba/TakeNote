@@ -3,6 +3,8 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:android_alarm_manager/android_alarm_manager.dart';
+import 'package:dynamic_theme/dynamic_theme.dart';
+import 'package:dynamic_theme/theme_switcher_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
@@ -22,10 +24,8 @@ import 'package:tasker/widgets/task.dart';
 class AllTasks extends StatefulWidget {
   const AllTasks({
     Key key,
-    this.port
   }) : super(key: key);
 
-  final ReceivePort port;
   @override
   _AllTasksState createState() => _AllTasksState();
 }
@@ -39,8 +39,8 @@ class _AllTasksState extends State<AllTasks> {
   DateTime dateTime;
   final CalendarController _calendarController = CalendarController();
 
-  var dayName;
-  var fetchedDate;
+  String dayName = '';
+  String fetchedDate = '';
 
   final List<String> _daysList = <String>[
     'S', 'S', 'M', 'T', 'W', 'T', 'F'
@@ -50,10 +50,6 @@ class _AllTasksState extends State<AllTasks> {
     '1', '2', '3', '4', '5', '6', '7'
   ];
 
-  final List<String> _randomTasks = <String>[
-    'Daily UI challenge', 'Study', 'Meeting', 'Travel', 'Explore',
-    'Daily UI challenge', 'Study', 'Meeting', 'Travel', 'Explore'
-  ];
 
   final List<String> _daysOfTheWeek = <String>[
     'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'
@@ -69,30 +65,8 @@ class _AllTasksState extends State<AllTasks> {
     await setPreference('CURRENT_DATE', DateTime.now().toString());
   }
   
-  Future<String> getDate() async {
-    fetchedDate = await getPreference('CURRENT_DATE')
-      .then((val) {
-        deleteTasks();
-      });
-    print(fetchedDate);
-    return fetchedDate;
-  }
-
-  Future<void> formatDate() async {
-    final String dateToFormat = await getDate();  
-    final DateTime currentDate = DateTime.now();
-    final DateTime date = DateFormat('yyyy-MM-dd hh:mm:ss').parse(dateToFormat);
-
-    final String currentDayMonth = '${currentDate.day}${currentDate.month}';
-    final String comparedDayMonth = '${date.day}${date.month}';
-
-    if(currentDayMonth != comparedDayMonth) {
-      await _databaseHelper.deleteAllTask();
-    }
-  }
-
   Future<void> deleteTasks() async {
-    String _stringDate = await getPreference('CURRENT_DATE');
+    final String _stringDate = await getPreference('CURRENT_DATE');
     final DateTime date = DateFormat('yyyy-M-d').parse(_stringDate);
     print(date);
     final String pastDateMonth = date.year.toString() + date.month.toString() + date.day.toString();
@@ -157,11 +131,13 @@ class _AllTasksState extends State<AllTasks> {
                         fontWeight: FontWeight.bold
                       ),
                     ),       
-                    // IconButton(
-                    //   icon: Icon(Icons.search),
-                    //   iconSize: 20.0,
-                    //   onPressed: () async {},
-                    // ),
+                    IconButton(
+                      icon: Icon(Icons.brightness_4),
+                      iconSize: 20.0,
+                      onPressed: () {
+                        showChooser();
+                      },
+                    ),
                   ],
                 ),
                 const SizedBox(height: 20.0,),
@@ -345,6 +321,27 @@ class _AllTasksState extends State<AllTasks> {
         );
       }
     );
+  }
+
+  void changeColor() {
+    DynamicTheme.of(context).setThemeData(ThemeData(
+      brightness: Brightness.dark,
+      primaryColor: Theme.of(context).primaryColor == Colors.blue
+          ? Colors.black26
+          : Colors.blue));
+  }
+
+  void showChooser() {
+    showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return BrightnessSwitcherDialog(
+          onSelectedTheme: (Brightness brightness) {
+            DynamicTheme.of(context).setBrightness(brightness);
+            Navigator.pop(context);
+          },
+        );
+    });
   }
 
   Widget _buildListTile(String title, String subtitle, Widget icon, [Color color]) {
