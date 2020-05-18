@@ -3,7 +3,6 @@ import 'package:tasker/core/models/todo.dart';
 import 'package:tasker/core/services/db_helper.dart';
 import 'package:tasker/utils/colors.dart';
 import 'package:tasker/utils/navigation.dart';
-import 'package:tasker/views/previous_tasks.dart';
 
 
 class AddTask extends StatefulWidget {
@@ -51,7 +50,7 @@ class _AddTaskState extends State<AddTask> {
     1, // priority
     '', // timeToStartAlarm
     0, // isDone
-    '' // timePosted
+    '', // timePosted
   );
 
   @override
@@ -136,15 +135,15 @@ class _AddTaskState extends State<AddTask> {
                             });
                           },
                         ),
-                        ListTile(
-                          leading: Icon(Icons.notifications_active, color: XColors.darkTextColor),
-                          title: Text(
-                            _selectedTimeBefore == null
-                            ? 'Choose mins '
-                            : '$_selectedTimeBefore mins before'
-                          ),
-                          onTap: () => showTimeForSound(),
-                        ),
+                        // ListTile(
+                        //   leading: Icon(Icons.notifications_active, color: XColors.darkTextColor),
+                        //   title: Text(
+                        //     _selectedTimeBefore == null
+                        //     ? 'Choose mins '
+                        //     : '$_selectedTimeBefore mins before'
+                        //   ),
+                        //   onTap: () => showTimeForSound(),
+                        // ),
                         ListTile(
                           leading: Icon(Icons.more, color: XColors.darkTextColor),
                           title: Text(
@@ -189,7 +188,6 @@ class _AddTaskState extends State<AddTask> {
                   ),
                 ),
               )
-
             ],
           ),
         ),
@@ -224,7 +222,7 @@ class _AddTaskState extends State<AddTask> {
   Future<void> _handleAddTask() async {
     if(_formKey.currentState.validate()) {
       todoTask.scheduledTime = scheduledTime.format(context);
-      todoTask.timeToStartAlarm = _selectedTimeBefore.toString();
+      todoTask.timeToStartAlarm = '';
       todoTask.category = _category;
       todoTask.uploadedTime = _timePosted.toString();
       if(_selectedPriority == 'High') {

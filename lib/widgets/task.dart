@@ -37,12 +37,8 @@ class _TaskItemState extends State<TaskItem> {
       actionPane: const SlidableStrechActionPane(),
       actionExtentRatio: 0.2,
       secondaryActions: <Widget>[
-        // IconSlideAction(
-        //   onTap: widget.onPinnedTapped,
-        //   iconWidget: Icon(Icons.edit, color: Colors.grey, size: 30.0),
-        // ),
-         IconSlideAction(
-           onTap: widget.onDeleteTapped,
+        IconSlideAction(
+          onTap: widget.onDeleteTapped,
           iconWidget: Icon(Icons.delete_outline, color: Colors.grey, size: 30.0),    
         )
       ],
@@ -78,7 +74,6 @@ class _TaskItemState extends State<TaskItem> {
                       ),
                     ),
                   ),
-
                   Expanded(
                     flex: 1,
                     child: Align(
@@ -102,7 +97,6 @@ class _TaskItemState extends State<TaskItem> {
 
                 ],
               ),
-
               const Divider()
             ],
           ),

@@ -7,7 +7,7 @@ class TodoTask {
     this._priority,
     this._timeToStartAlarm,
     this._isDone,
-    this._uploadedTime
+    this._uploadedTime,
   );
 
   TodoTask.withId(
@@ -18,7 +18,7 @@ class TodoTask {
     this._priority,
     this._timeToStartAlarm,
     this._isDone,
-    this._uploadedTime
+    this._uploadedTime,
   );
 
   TodoTask.fromMap(Map<String, dynamic> map) {
@@ -74,9 +74,9 @@ class TodoTask {
   }
 
 
+
   Map<String, dynamic> toMap() {
     final Map<String, dynamic> map = <String, dynamic>{};
-
     map['title'] = _title;
     map['scheduledTime'] = _scheduledTime;
     map['category'] = _category;
@@ -91,11 +91,6 @@ class TodoTask {
     return map;
   }
 
- 
-
-
-
-
   int _id;
   String _title;
   String _scheduledTime;
@@ -104,6 +99,5 @@ class TodoTask {
   String _timeToStartAlarm;
   int _isDone;
   String _uploadedTime;
-
 
 }

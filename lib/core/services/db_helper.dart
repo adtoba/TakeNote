@@ -25,6 +25,7 @@ class DBHelper {
   Future<Database> initializeDatabase() async {
     final Directory directory = await getApplicationDocumentsDirectory(); 
     final String path = directory.path + Constants.TODO_DBNAME;
+    
 
     final Database _taskDatabase = await openDatabase(path, version: 1, onCreate: _createDb);
     return _taskDatabase;
@@ -62,6 +63,16 @@ class DBHelper {
     return result;
   }
 
+  Future<void> deleteAllTask() async {
+    final Database dbClient = await database;
+    final Directory directory = await getApplicationDocumentsDirectory(); 
+    final String path = directory.path + Constants.TODO_DBNAME;
+    await deleteDatabase(path);
+    // await _database.close();
+    // final Future<int> result = dbClient.rawDelete('delete from ', <dynamic>['${Constants.TODO_TASK_TABLE}']);
+    // return result;
+  }
+
   // This function gets the total number of tasks in the database
   Future<int> getCount() async {
     final Database dbClient = await database;
@@ -73,10 +84,13 @@ class DBHelper {
   // This function gets all the tasks in the database as a map object
   Future<List<Map<String, dynamic>>> getTaskMapList() async {
     final Database dbClient = await database;
-    final List<Map<String, dynamic>> taskList = await dbClient.query(Constants.TODO_TASK_TABLE, orderBy: '${Constants.colPriority} ASC');
+    final List<Map<String, dynamic>> taskList = await dbClient.query(
+      Constants.TODO_TASK_TABLE, orderBy: '${Constants.colPriority} ASC');
 
     return taskList;
   }
+
+
 
   // This function gets all the tasks as a List object from the map object 
   Future<List<TodoTask>> getTaskList() async {

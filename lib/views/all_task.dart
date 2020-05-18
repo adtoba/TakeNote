@@ -14,6 +14,7 @@ import 'package:tasker/core/models/todo.dart';
 import 'package:tasker/core/services/db_helper.dart';
 import 'package:tasker/utils/colors.dart';
 import 'package:tasker/utils/navigation.dart';
+import 'package:tasker/utils/preferences.dart';
 import 'package:tasker/views/add_task.dart';
 import 'package:tasker/widgets/task.dart';
 
@@ -39,6 +40,7 @@ class _AllTasksState extends State<AllTasks> {
   final CalendarController _calendarController = CalendarController();
 
   var dayName;
+  var fetchedDate;
 
   final List<String> _daysList = <String>[
     'S', 'S', 'M', 'T', 'W', 'T', 'F'
@@ -62,62 +64,60 @@ class _AllTasksState extends State<AllTasks> {
     'August', 'September', 'October', 'November', 'December'
   ];
 
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
 
-  NotificationAppLaunchDetails notificationAppLaunchDetails;
+  Future<void> saveCurrentDate() async {
+    await setPreference('CURRENT_DATE', DateTime.now().toString());
+  }
+  
+  Future<String> getDate() async {
+    fetchedDate = await getPreference('CURRENT_DATE')
+      .then((val) {
+        deleteTasks();
+      });
+    print(fetchedDate);
+    return fetchedDate;
+  }
 
+  Future<void> formatDate() async {
+    final String dateToFormat = await getDate();  
+    final DateTime currentDate = DateTime.now();
+    final DateTime date = DateFormat('yyyy-MM-dd hh:mm:ss').parse(dateToFormat);
 
+    final String currentDayMonth = '${currentDate.day}${currentDate.month}';
+    final String comparedDayMonth = '${date.day}${date.month}';
 
-  int _counter = 0;
+    if(currentDayMonth != comparedDayMonth) {
+      await _databaseHelper.deleteAllTask();
+    }
+  }
 
-  @override
-  void initState() {
-    if(_tasksList == null) {
+  Future<void> deleteTasks() async {
+    String _stringDate = await getPreference('CURRENT_DATE');
+    final DateTime date = DateFormat('yyyy-M-d').parse(_stringDate);
+    print(date);
+    final String pastDateMonth = date.year.toString() + date.month.toString() + date.day.toString();
+    final String currentDateMonth = dateTime.year.toString() + dateTime.month.toString() + dateTime.day.toString();
+    if(pastDateMonth != currentDateMonth) {
+      await _databaseHelper.deleteAllTask();
+      updateListView();
+    } else {
+      if(_tasksList == null) {
       _tasksList = <TodoTask>[];
       updateListView();
     }
-
-    AndroidAlarmManager.initialize();
-    
-    widget.port.listen((_) async => await _incrementCounter());
+    }
+  }
+  
+  @override
+  void initState() {
     dateTime = DateTime.now();
-    dayName = DateFormat('EEEE').format(dateTime);
-
+    dayName = DateFormat('EEEE').format(dateTime);  
+    // getDate();
+    deleteTasks();
+    saveCurrentDate();
+    // formatDate();
     
     super.initState();
-  }
-  static const String isolateName = 'isolate';
-
-  SharedPreferences prefs;
-
-
-  static SendPort uiSendPort;
-  static const String countKey = 'count';
-
-  Future<void> _incrementCounter() async {
-    print('Increment counter!');
-    prefs = await SharedPreferences.getInstance();
-
-    // Ensure we've loaded the updated count from the background isolate.
-    await prefs.reload();
-
-    setState(() {
-      _counter++;
-    });
-  }
-  
-  Future<void> callback() async {
-    print('Alarm fired!');
-  
-    // Get the previous cached count and increment it.
-    final prefs = await SharedPreferences.getInstance();
-    int currentCount = prefs.getInt(countKey);
-    await prefs.setInt(countKey, currentCount + 1);
-
-    // This will be null if we're running in the background.
-    uiSendPort ??= IsolateNameServer.lookupPortByName(isolateName);
-    uiSendPort?.send(null);
   }
 
   @override
@@ -157,30 +157,11 @@ class _AllTasksState extends State<AllTasks> {
                         fontWeight: FontWeight.bold
                       ),
                     ),       
-                    IconButton(
-                      icon: Icon(Icons.search),
-                      iconSize: 20.0,
-                      key: const ValueKey('RegisterOneShotAlarm'),
-                      onPressed: () async {
-                         await AndroidAlarmManager.oneShot(
-                          const Duration(seconds: 2),
-                          // Ensure we have a unique alarm ID.
-                          Random().nextInt(pow(2, 31)),
-                          callback,
-                          exact: true,
-                          wakeup: true,
-                          // alarmClock: true,
-                          allowWhileIdle: true
-                        );
-                      },
-                    ),
-
-                    // Text(
-                    //   prefs.getInt(countKey).toString(),
-                    //   key: ValueKey('BackgroundCountText'),
-                      
+                    // IconButton(
+                    //   icon: Icon(Icons.search),
+                    //   iconSize: 20.0,
+                    //   onPressed: () async {},
                     // ),
-
                   ],
                 ),
                 const SizedBox(height: 20.0,),
@@ -188,14 +169,16 @@ class _AllTasksState extends State<AllTasks> {
                   calendarController: _calendarController,
                   headerVisible: false,
                   initialCalendarFormat: CalendarFormat.twoWeeks,
-                ),
-                
+                  onDaySelected: (DateTime dateSelected, List<dynamic> onSelectedDay) {
+                    print(dateSelected.toString());
+                    print(onSelectedDay.toString());
+                  },
+                ),        
                 const SizedBox(height: 10.0),
                 const Divider(),
-
                 Builder(
                   builder: (BuildContext context) {
-                    if(_tasksList.isEmpty) {
+                    if(_tasksList == null || _tasksList.isEmpty) {
                       return Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -226,14 +209,18 @@ class _AllTasksState extends State<AllTasks> {
                               isChecked: item.isDone  == 0 
                                   ? false : true,
                               onChanged: (bool value) {
-                                TodoTask task = TodoTask(
+                                if(item.isDone == 0) {
+                                  showRemoveDialog(context, item);
+                                } 
+                                
+                                final TodoTask task = TodoTask(
                                   _tasksList[index].title,
                                   _tasksList[index].scheduledTime,
                                   _tasksList[index].category,
                                   _tasksList[index].priority,
                                   _tasksList[index].timeToStartAlarm,
                                   _tasksList[index].isDone,
-                                  _tasksList[index].uploadedTime
+                                  _tasksList[index].uploadedTime,
                                 );
                                 task.isDone = value == true ? 1 : 0;
 
@@ -241,12 +228,7 @@ class _AllTasksState extends State<AllTasks> {
                                 _databaseHelper.updateTask(task);
                                 updateListView();
                               },
-                              onPressed: () {
-                                showDetails(item);
-                              },
-                              onPinnedTapped: () {
-                                
-                              },
+                              onPressed: () => showDetails(item),
                               onDeleteTapped: () {
                                 _delete(context, _tasksList[index]);
                                 print(_tasksList[index].title);
@@ -267,10 +249,36 @@ class _AllTasksState extends State<AllTasks> {
           },
           child: Icon(Icons.add),
         ),
-
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),  
     );  
+  }
+
+  void showRemoveDialog(BuildContext context, TodoTask todo) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: const Text('Remove from todo-list?'),
+          actions: <Widget>[
+            FlatButton(
+              onPressed: () {
+                _databaseHelper.deleteTask(todo.id);
+                updateListView();
+                Navigator.pop(context);
+              },
+              child: const Text('YES'),
+            ),
+            FlatButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('NO'),
+            ),
+          ],
+        );
+      }
+    );
   }
 
   void showDetails(TodoTask todo) {
@@ -302,15 +310,15 @@ class _AllTasksState extends State<AllTasks> {
                       ? 'HIGH'
                       : 'LOW', 
                     Container(
-                        width: 10.0,
-                        height: 10.0,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: todo.priority == 0
-                            ? Colors.red
-                            : Colors.blue
-                        ),
+                      width: 10.0,
+                      height: 10.0,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: todo.priority == 0
+                          ? Colors.red
+                          : Colors.blue
                       ),
+                    ),
                     todo.priority == 0 
                       ? Colors.red
                       : Colors.blue
@@ -319,10 +327,10 @@ class _AllTasksState extends State<AllTasks> {
                 _buildListTile(
                   'Category', todo.category, Icon(Icons.category)
                 ),
-                const SizedBox(height: 20.0),
-                _buildListTile(
-                  'To notify', '${todo.timeToStartAlarm} minutes before', Icon(Icons.timelapse)
-                ),
+                // const SizedBox(height: 20.0),
+                // _buildListTile(
+                //   'To notify', '${todo.timeToStartAlarm} minutes before', Icon(Icons.timelapse)
+                // ),
                 const SizedBox(height: 20.0),
                 _buildListTile(
                   'Status', todo.isDone == 0
