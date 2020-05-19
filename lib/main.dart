@@ -20,22 +20,24 @@ class MyApp extends StatelessWidget {
       defaultBrightness: Brightness.light,
       data: (Brightness brightness) 
         => ThemeData(
+          brightness: brightness,
+          textTheme: GoogleFonts.poppinsTextTheme(
+            Theme.of(context).textTheme.apply(
+              bodyColor: brightness == Brightness.dark ? Colors.white : Colors.black,
+              displayColor: brightness == Brightness.dark ? Colors.white : Colors.black
+            )
+          ),
+          primarySwatch: Colors.blue,
           iconTheme: IconThemeData(
             color: brightness == Brightness.dark 
               ? Colors.white 
               : Colors.black
-          ),
-          
+          ),          
         ),
       themedWidgetBuilder: (BuildContext context, ThemeData theme) {
         return  MaterialApp(
           title: 'Flutter Demo',
-          theme: ThemeData(
-            textTheme: GoogleFonts.poppinsTextTheme(
-              Theme.of(context).textTheme,
-            ),
-            primarySwatch: Colors.blue,
-          ),
+          theme: theme,
           home: const AllTasks()
         );
       }

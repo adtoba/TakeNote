@@ -1,4 +1,4 @@
-name: tasker
+name: TakeNote
 description: A new Flutter project.
 
 # The following defines the version and build number for your application.
@@ -25,14 +25,12 @@ dependencies:
   cupertino_icons: ^0.1.2
   google_fonts: ^1.0.0
   flutter_cupertino_date_picker: ^1.0.24
-  android_alarm_manager: ^0.4.5+10
   sqflite: any
   path_provider: any
   table_calendar: ^2.2.3
   dynamic_theme: any
   intl: ^0.16.1  
   shared_preferences: any
-  flutter_local_notifications: ^1.4.3
   flutter_slidable: "^0.5.4"
 
 

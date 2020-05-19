@@ -112,6 +112,10 @@ class _AddTaskState extends State<AddTask> {
                           validator: (String value) {
                             if(value.isEmpty) {
                               return 'Oops, you forgot to add a title';
+                            } else if(_category == null) {
+                              return 'select a category';
+                            } else if(scheduledTime == null){
+                              return 'choose time';
                             } else {
                               return null;
                             }
@@ -119,7 +123,7 @@ class _AddTaskState extends State<AddTask> {
                         ),
                         const SizedBox(height: 10.0),
                         ListTile(
-                          leading: Icon(Icons.timer, color: XColors.darkTextColor),
+                          leading: Icon(Icons.timer),
                           title: Text(
                             scheduledTime != null 
                               ? scheduledTime.format(context) 
@@ -145,7 +149,7 @@ class _AddTaskState extends State<AddTask> {
                         //   onTap: () => showTimeForSound(),
                         // ),
                         ListTile(
-                          leading: Icon(Icons.more, color: XColors.darkTextColor),
+                          leading: Icon(Icons.more),
                           title: Text(
                             _category == null 
                               ? 'Category' 

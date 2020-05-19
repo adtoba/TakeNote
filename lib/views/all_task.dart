@@ -104,7 +104,6 @@ class _AllTasksState extends State<AllTasks> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.white,
         body: Container(
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
@@ -126,7 +125,7 @@ class _AllTasksState extends State<AllTasks> {
                     Text(
                       'TO-DO List',
                       style: TextStyle(
-                        color: XColors.darkTextColor,
+                        // color: XColors.darkTextColor,
                         fontSize: 30.0,
                         fontWeight: FontWeight.bold
                       ),

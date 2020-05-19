@@ -42,64 +42,61 @@ class _TaskItemState extends State<TaskItem> {
           iconWidget: Icon(Icons.delete_outline, color: Colors.grey, size: 30.0),    
         )
       ],
-      child: Card(
-        elevation: 0.0,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-          width: double.infinity,
-          height: 70.0,
-          child: Column(
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Container(
-                    width: 10.0,
-                    height: 10.0,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: widget.priorityColor
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+        width: double.infinity,
+        height: 70.0,
+        child: Column(
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                Container(
+                  width: 10.0,
+                  height: 10.0,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: widget.priorityColor
+                  ),
+                ),
+                const SizedBox(width: 25.0),
+                Expanded(
+                  flex: 4,
+                  child: GestureDetector(
+                    onTap: widget.onPressed,
+                    child: Text(
+                      widget.title, style: TextStyle(
+                        fontSize: 18.0, decoration: widget.isTaskDone ? TextDecoration.lineThrough : TextDecoration.none
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  const SizedBox(width: 25.0),
-                  Expanded(
-                    flex: 4,
-                    child: GestureDetector(
-                      onTap: widget.onPressed,
-                      child: Text(
-                        widget.title, style: TextStyle(
-                          fontSize: 18.0, decoration: widget.isTaskDone ? TextDecoration.lineThrough : TextDecoration.none
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Checkbox(
+                      value: widget.isChecked,
+                      onChanged: widget.onChanged
                     ),
                   ),
-                  Expanded(
-                    flex: 1,
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: Checkbox(
-                        value: widget.isChecked,
-                        onChanged: widget.onChanged
-                      ),
+                ),
+                Visibility(
+                  visible: isVisible,
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Checkbox(
+                      value: widget.isChecked,
+                      onChanged: widget.onChanged
                     ),
                   ),
-                  Visibility(
-                    visible: isVisible,
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: Checkbox(
-                        value: widget.isChecked,
-                        onChanged: widget.onChanged
-                      ),
-                    ),
-                  )
+                )
 
-                ],
-              ),
-              const Divider()
-            ],
-          ),
+              ],
+            ),
+            const Divider()
+          ],
         ),
       ),
     );
