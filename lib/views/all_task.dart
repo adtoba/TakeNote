@@ -1,24 +1,18 @@
-import 'dart:isolate';
-import 'dart:math';
 import 'dart:ui';
 
-import 'package:android_alarm_manager/android_alarm_manager.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:dynamic_theme/theme_switcher_widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:tasker/core/models/task.dart';
-import 'package:tasker/core/models/todo.dart';
-import 'package:tasker/core/services/db_helper.dart';
-import 'package:tasker/utils/colors.dart';
-import 'package:tasker/utils/navigation.dart';
-import 'package:tasker/utils/preferences.dart';
-import 'package:tasker/views/add_task.dart';
-import 'package:tasker/widgets/task.dart';
+import 'package:TakeNote/models/todo.dart';
+import 'package:TakeNote/db/db_helper.dart';
+import 'package:TakeNote/utils/colors.dart';
+import 'package:TakeNote/utils/navigation.dart';
+import 'package:TakeNote/utils/preferences.dart';
+import 'package:TakeNote/views/add_task.dart';
+import 'package:TakeNote/widgets/task.dart';
 
 
 class AllTasks extends StatefulWidget {
@@ -42,9 +36,6 @@ class _AllTasksState extends State<AllTasks> {
   String dayName = '';
   String fetchedDate = '';
 
-  final List<String> _daysList = <String>[
-    'S', 'S', 'M', 'T', 'W', 'T', 'F'
-  ];
 
   final List<String> _days = <String>[
     '1', '2', '3', '4', '5', '6', '7'
@@ -52,35 +43,24 @@ class _AllTasksState extends State<AllTasks> {
 
 
   final List<String> _daysOfTheWeek = <String>[
-    'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'
+    'Monday', 
+    'Tuesday', 
+    'Wednesday', 
+    'Thursday', 
+    'Friday'
   ];
 
   final List<String> _months = <String>[
-    'January', 'February', 'March', 'April', 'May', 'June', 'July',
-    'August', 'September', 'October', 'November', 'December'
+    'January', 'February', 
+    'March', 'April', 
+    'May', 'June', 
+    'July', 'August', 
+    'September', 'October', 
+    'November', 'December'
   ];
 
 
-  Future<void> saveCurrentDate() async {
-    await setPreference('CURRENT_DATE', DateTime.now().toString());
-  }
   
-  Future<void> deleteTasks() async {
-    final String _stringDate = await getPreference('CURRENT_DATE');
-    final DateTime date = DateFormat('yyyy-M-d').parse(_stringDate);
-    print(date);
-    final String pastDateMonth = date.year.toString() + date.month.toString() + date.day.toString();
-    final String currentDateMonth = dateTime.year.toString() + dateTime.month.toString() + dateTime.day.toString();
-    if(pastDateMonth != currentDateMonth) {
-      await _databaseHelper.deleteAllTask();
-      updateListView();
-    } else {
-      if(_tasksList == null) {
-      _tasksList = <TodoTask>[];
-      updateListView();
-    }
-    }
-  }
   
   @override
   void initState() {
@@ -88,7 +68,7 @@ class _AllTasksState extends State<AllTasks> {
     dayName = DateFormat('EEEE').format(dateTime);  
     // getDate();
     deleteTasks();
-    saveCurrentDate();
+    _syncCurrentDate();
     // formatDate();
     
     super.initState();
@@ -144,10 +124,7 @@ class _AllTasksState extends State<AllTasks> {
                   calendarController: _calendarController,
                   headerVisible: false,
                   initialCalendarFormat: CalendarFormat.twoWeeks,
-                  onDaySelected: (DateTime dateSelected, List<dynamic> onSelectedDay) {
-                    print(dateSelected.toString());
-                    print(onSelectedDay.toString());
-                  },
+                  // onDaySelected: (DateTime dateSelected, List<dynamic> onSelectedDay) {},
                 ),        
                 const SizedBox(height: 10.0),
                 const Divider(),
@@ -170,46 +147,44 @@ class _AllTasksState extends State<AllTasks> {
                       );
                     } else {
                       return ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: _count,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemBuilder: (BuildContext context, int index) {
-                            final TodoTask item = _tasksList[index];
-                            
-                            return TaskItem(
-                              key: Key(item.scheduledTime),
-                              title: _tasksList[index].title,
-                              isTaskDone: _tasksList[index].isDone == 0 ? false : true,
-                              priorityColor: _tasksList[index].priority == 0 ? Colors.red : Colors.blue,
-                              isChecked: item.isDone  == 0 
-                                  ? false : true,
-                              onChanged: (bool value) {
-                                if(item.isDone == 0) {
-                                  showRemoveDialog(context, item);
-                                } 
-                                
-                                final TodoTask task = TodoTask(
-                                  _tasksList[index].title,
-                                  _tasksList[index].scheduledTime,
-                                  _tasksList[index].category,
-                                  _tasksList[index].priority,
-                                  _tasksList[index].timeToStartAlarm,
-                                  _tasksList[index].isDone,
-                                  _tasksList[index].uploadedTime,
-                                );
-                                task.isDone = value == true ? 1 : 0;
-
-                                task.id = _tasksList[index].id;
-                                _databaseHelper.updateTask(task);
-                                updateListView();
-                              },
-                              onPressed: () => showDetails(item),
-                              onDeleteTapped: () {
-                                _delete(context, _tasksList[index]);
-                                print(_tasksList[index].title);
-                              },
-                            );
-                          },
+                        shrinkWrap: true,
+                        itemCount: _count,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemBuilder: (BuildContext context, int index) {
+                          final TodoTask item = _tasksList[index];
+                          final TodoTask task = TodoTask(
+                            _tasksList[index].title,
+                            _tasksList[index].scheduledTime,
+                            _tasksList[index].category,
+                            _tasksList[index].priority,
+                            _tasksList[index].timeToStartAlarm,
+                            _tasksList[index].isDone,
+                            _tasksList[index].uploadedTime,
+                          );
+                          
+                          return TaskItem(
+                            key: Key(item.scheduledTime),
+                            title: _tasksList[index].title,
+                            isTaskDone: _tasksList[index].isDone == 0 ? false : true,
+                            priorityColor: _tasksList[index].priority == 0 ? Colors.red : Colors.blue,
+                            isChecked: item.isDone  == 0 
+                                ? false : true,
+                            onChanged: (bool value) {
+                              if(item.isDone == 0) {
+                                showRemoveDialog(context, item);
+                              }
+                              task.isDone = value == true ? 1 : 0;
+                              task.id = _tasksList[index].id;
+                              _databaseHelper.updateTask(task);
+                              updateListView();
+                            },
+                            onPressed: () => showDetails(item),
+                            onDeleteTapped: () {
+                              _delete(context, _tasksList[index]);
+                              print(_tasksList[index].title);
+                            },
+                          );
+                        },
                       ); 
                     }
                   },
@@ -227,6 +202,28 @@ class _AllTasksState extends State<AllTasks> {
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),  
     );  
+  }
+
+  Future<void> _syncCurrentDate() async {
+    await setPreference('CURRENT_DATE', DateTime.now().toString());
+  }
+  
+  Future<void> deleteTasks() async {
+    final String _stringDate = await getPreference('CURRENT_DATE');
+    final DateTime date = DateFormat('yyyy-M-d').parse(_stringDate);
+
+    final String pastDateMonth = date.year.toString() + date.month.toString() + date.day.toString();
+    final String currentDateMonth = dateTime.year.toString() + dateTime.month.toString() + dateTime.day.toString();
+    
+    if(pastDateMonth != currentDateMonth) {
+      await _databaseHelper.deleteAllTask();
+      updateListView();
+    } else {
+      if(_tasksList == null) {
+      _tasksList = <TodoTask>[];
+      updateListView();
+    }
+    }
   }
 
   void showRemoveDialog(BuildContext context, TodoTask todo) {

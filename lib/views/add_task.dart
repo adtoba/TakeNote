@@ -1,8 +1,6 @@
+import 'package:TakeNote/models/todo.dart';
+import 'package:TakeNote/db/db_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:tasker/core/models/todo.dart';
-import 'package:tasker/core/services/db_helper.dart';
-import 'package:tasker/utils/colors.dart';
-import 'package:tasker/utils/navigation.dart';
 
 
 class AddTask extends StatefulWidget {
@@ -34,12 +32,9 @@ class _AddTaskState extends State<AddTask> {
    
   // All variables needed to save task
   TimeOfDay scheduledTime;
-  final List<int> _timeBefore = <int>[
-    5, 10, 15, 20, 25, 30
-  ];
   String _selectedPriority;
   int _selectedTimeBefore;
-  TextEditingController _taskController;
+  
   String _category;
   DateTime _timePosted;
 
@@ -52,6 +47,9 @@ class _AddTaskState extends State<AddTask> {
     0, // isDone
     '', // timePosted
   );
+
+  // Text controller
+  TextEditingController _taskController;
 
   @override
   void initState() {
@@ -94,14 +92,10 @@ class _AddTaskState extends State<AddTask> {
                           cursorColor: Colors.grey,
                           maxLines: 4,
                           textInputAction: TextInputAction.done,
-                          style: const TextStyle(
-                            fontSize: 23.0
-                          ),
+                          style: const TextStyle(fontSize: 23.0),
                           decoration: const InputDecoration(
                             hintText: 'Write task here',
-                            hintStyle: TextStyle(
-                              fontSize: 30.0
-                            ),
+                            hintStyle: TextStyle(fontSize: 30.0),
                             border: OutlineInputBorder(
                               borderSide: BorderSide.none
                             )
@@ -139,15 +133,7 @@ class _AddTaskState extends State<AddTask> {
                             });
                           },
                         ),
-                        // ListTile(
-                        //   leading: Icon(Icons.notifications_active, color: XColors.darkTextColor),
-                        //   title: Text(
-                        //     _selectedTimeBefore == null
-                        //     ? 'Choose mins '
-                        //     : '$_selectedTimeBefore mins before'
-                        //   ),
-                        //   onTap: () => showTimeForSound(),
-                        // ),
+                       
                         ListTile(
                           leading: Icon(Icons.more),
                           title: Text(
@@ -324,35 +310,6 @@ class _AddTaskState extends State<AddTask> {
                   },
                 )
               ],
-            ),
-          ),
-        );
-      }
-    );
-  }
-
-  void showTimeForSound() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          child: Container(
-            height: 300.0,
-            child: SingleChildScrollView(
-              child: Column(
-                children: List<Widget>.generate(_timeBefore.length, (int index) {
-                  return ListTile(
-                    title: Text('${_timeBefore[index]} mins before'),
-                    onTap: () {
-                      setState(() {
-                        _selectedTimeBefore = _timeBefore[index];
-                        print(_selectedTimeBefore);
-                      });
-                      Navigator.pop(context);
-                    },
-                  );
-                })
-              ),
             ),
           ),
         );

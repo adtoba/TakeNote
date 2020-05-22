@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tasker/utils/colors.dart';
+import 'package:TakeNote/utils/colors.dart';
 
 class TextInput extends StatelessWidget {
   const TextInput({
