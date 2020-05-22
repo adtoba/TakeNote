@@ -1,4 +1,4 @@
-# Tasker
+# TakeNote
 
 A simple sqflite todo app with flutter
 
