@@ -160,27 +160,25 @@ class _AddTaskState extends State<AddTask> {
                   ),
                 ),
               ),
-
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: MaterialButton(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0)
-                    ),
-                    minWidth: double.infinity,
-                    height: 50.0,
-                    onPressed: () => _handleAddTask(),
-                    color: Colors.blue,
-                    textColor: Colors.white,
-                    child: const Text('Add'),
-                  ),
-                ),
-              )
             ],
           ),
         ),
+        persistentFooterButtons: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: MaterialButton(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0)
+              ),
+              minWidth: 500,
+              height: 50.0,
+              onPressed: () => _handleAddTask(),
+              color: Colors.blue,
+              textColor: Colors.white,
+              child: const Text('Add'),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -73,11 +73,16 @@ class _AllTasksState extends State<AllTasks> {
     
     super.initState();
   }
+  
 
   @override
   void didChangeDependencies() {
-    updateListView();
     super.didChangeDependencies();
+    if (_tasksList == null) {
+      _tasksList = List<TodoTask>();
+      updateListView();
+    }
+    // updateListView();
   }
 
   @override
@@ -130,6 +135,7 @@ class _AllTasksState extends State<AllTasks> {
                 const Divider(),
                 Builder(
                   builder: (BuildContext context) {
+                    updateListView();
                     if(_tasksList == null || _tasksList.isEmpty) {
                       return Center(
                         child: Column(
@@ -364,8 +370,8 @@ class _AllTasksState extends State<AllTasks> {
       final Future<List<TodoTask>> taskListFuture = _databaseHelper.getTaskList();
       taskListFuture.then((List<TodoTask> taskList) {
         setState(() {
-          _tasksList = taskList;
-          _count = taskList.length;
+          this._tasksList = taskList;
+          this._count = taskList.length;
         });
       });
     });

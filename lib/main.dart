@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:TakeNote/views/splash_screen.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -33,9 +34,9 @@ class MyApp extends StatelessWidget {
         ),
       themedWidgetBuilder: (BuildContext context, ThemeData theme) {
         return  MaterialApp(
-          title: 'Flutter Demo',
+          title: 'TakeNote',
           theme: theme,
-          home: const AllTasks()
+          home: SplashScreen()
         );
       }
       

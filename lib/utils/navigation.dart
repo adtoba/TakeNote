@@ -6,3 +6,10 @@ void push(BuildContext context, Widget screen) {
     return screen;
   }));
 }
+
+void pushUntil(BuildContext context, Widget screen) {
+  Navigator.pushAndRemoveUntil(context, MaterialPageRoute<dynamic>(builder: (BuildContext context) {
+    return screen;
+  }), (Route<dynamic> route) => false);
+
+}
